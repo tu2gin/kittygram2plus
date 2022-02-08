@@ -36,14 +36,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
     'rest_framework',
+    'django_filters',
+    'corsheaders',
     'djoser',
     'cats.apps.CatsConfig',
 ]
 
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -154,4 +159,39 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_ORIGIN_ALLOW_ALL: значение True, установленное для этого ключа, 
+# разрешит обрабатывать запросы, приходящие с любого хоста, игнорируя 
+# политику Same Origin. Если установить False или просто удалить этот 
+# ключ из конфига, будут разрешены только запросы с текущего хоста.
+
+CORS_URLS_REGEX = r'^/api/.*$'
+
+# CORS_URLS_REGEX: значением этого ключа должно быть регулярное 
+# выражение — шаблон тех URL вашего проекта, к которым можно обращаться 
+# с других доменов.
+
+# CORS_ORIGIN_WHITELIST = 'localhost:3000'
+
+# Важно: если вы делаете закрытый API, то в CORS_ORIGIN_WHITELIST 
+# укажите домен, с которого разрешены запросы (например, localhost:3000), 
+# и удалите ключ CORS_ORIGIN_ALLOW_ALL 
+# (тогда он примет значение по умолчанию: False). 
+
+
+# Swagger предоставляет возможность передавать токен при отправке запросов, 
+# но по умолчанию эта опция выключена. Чтобы включить ее добавьте в 
+# settings.py следующие настройки:
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   }
 }

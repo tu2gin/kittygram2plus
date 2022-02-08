@@ -3,19 +3,70 @@ from rest_framework import viewsets
 from .models import Achievement, Cat, User
 
 from .serializers import AchievementSerializer, CatSerializer, UserSerializer
-from .permissions import ReadOnly
-
+from .pagination import CatsPagination
+from .permissions import ReadOnly, OwnerOrReadOnly
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions
 from rest_framework.throttling import AnonRateThrottle
+from rest_framework import filters
+
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
+
 
 
 class CatViewSet(viewsets.ModelViewSet):
+# Фильтрация
+
     queryset = Cat.objects.all()
     serializer_class = CatSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    throttle_classes = (AnonRateThrottle,)  # Подключили класс AnonRateThrottle 
-    # Для любых пользователей установим кастомный лимит 1 запрос в минуту
-    throttle_scope = 'low_request' 
+    permission_classes = (OwnerOrReadOnly,)
+    # Указываем фильтрующий бэкенд DjangoFilterBackend
+    # Из библиотеки django-filter
+    filter_backends = (DjangoFilterBackend,)
+    # Временно отключим пагинацию на уровне вьюсета, 
+    # так будет удобнее настраивать фильтрацию
+    pagination_class = None
+    # Фильтровать будем по полям color и birth_year модели Cat
+    filterset_fields = ('color', 'birth_year')
+    search_fields = ('name',)
+
+# + Поиск
+
+    # queryset = Cat.objects.all()
+    # serializer_class = CatSerializer
+    # permission_classes = (OwnerOrReadOnly,)
+    # # Добавим в кортеж ещё один бэкенд
+    # filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    # pagination_class = None
+    # filterset_fields = ('color', 'birth_year')
+    # search_fields = ('name',) 
+
+# + Сортрировка
+
+    # queryset = Cat.objects.all()
+    # serializer_class = CatSerializer
+    # permission_classes = (OwnerOrReadOnly,)
+    # filter_backends = (DjangoFilterBackend, filters.SearchFilter,
+    #                    filters.OrderingFilter)
+    # pagination_class = None
+    # filterset_fields = ('color', 'birth_year')
+    # search_fields = ('name',)
+    # ordering_fields = ('name', 'birth_year') 
+
+
+# + Упорядочим выдачу наших котиков по умолчанию по году рождения
+
+    # queryset = Cat.objects.all()
+    # serializer_class = CatSerializer
+    # permission_classes = (OwnerOrReadOnly,)
+    # filter_backends = (DjangoFilterBackend, filters.SearchFilter,
+    #                    filters.OrderingFilter)
+    # pagination_class = None
+    # filterset_fields = ('color', 'birth_year')
+    # search_fields = ('name',)
+    # ordering_fields = ('name', 'birth_year')
+    # ordering = ('birth_year',)
+
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user) 
