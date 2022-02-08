@@ -127,6 +127,8 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 2,
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated', 
     ],
@@ -146,6 +148,7 @@ REST_FRAMEWORK = {
         # в меру собственной фантазии
         'low_request': '1/minute',
     }
+    
 }
 
 SIMPLE_JWT = {
